@@ -2,6 +2,8 @@ package com.example.recipeBoard.service;
 
 import com.example.recipeBoard.dto.BoardDTO;
 import com.example.recipeBoard.entity.BoardEntity;
+import com.example.recipeBoard.entity.BoardFileEntity;
+import com.example.recipeBoard.repository.BoardFileRepository;
 import com.example.recipeBoard.repository.BoardRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -27,6 +29,7 @@ import java.util.Optional;
 public class BoardService {
 
     private final BoardRepository boardRepository;
+    private final BoardFileRepository boardFileRepository;
 
     public void save(BoardDTO boardDTO) throws IOException {
         // 파일 첨부 여부에 따라 로직 분리
@@ -51,6 +54,11 @@ public class BoardService {
             String storedFileName = System.currentTimeMillis() + "_" + originalFilename; // 3.
             String savePath = "/Users/jeongyoungjun/Desktop/springboot_img/" + storedFileName; // 4.
             boardFile.transferTo(new File(savePath)); // 5.
+            BoardEntity boardEntity = BoardEntity.toSaveFileEntity(boardDTO);
+            Long savedId = boardRepository.save(boardEntity).getId();
+            BoardEntity board = boardRepository.findById(savedId).get();
+            BoardFileEntity boardFileEntity = BoardFileEntity.toBoardFileEntity(board, originalFilename, storedFileName);
+            boardFileRepository.save(boardFileEntity);
 
 
         }
