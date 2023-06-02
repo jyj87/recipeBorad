@@ -27,6 +27,8 @@ public class BoardController {
 
     @PostMapping("/save")
     public String save(@ModelAttribute BoardDTO boardDTO) throws IOException {
+        System.out.println("================================");
+        System.out.println("test");
         System.out.println("boardDTO = " + boardDTO);
         boardService.save(boardDTO);
         return "index";

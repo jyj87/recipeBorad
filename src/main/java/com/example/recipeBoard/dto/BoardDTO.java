@@ -1,10 +1,13 @@
 package com.example.recipeBoard.dto;
 
 import com.example.recipeBoard.entity.BoardEntity;
+import com.example.recipeBoard.entity.BoardFileEntity;
 import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 // DTO(Data Transfer Object), vo, bean
 @Getter
@@ -22,9 +25,9 @@ public class BoardDTO {
     private LocalDateTime boardCreatedTime;
     private LocalDateTime boardUpdatedTime;
 
-    private MultipartFile boardFile; // save.html -> Controller  파일을 담는 용도
-    private String originalFilename; // 원본 파일 이름
-    private String storedFilename; // 서버 저장용 파일 이름
+    private List<MultipartFile> boardFile; // save.html -> Controller  파일을 담는 용도
+    private List<String> originalFileName; // 원본 파일 이름
+    private List<String> storedFileName; // 서버 저장용 파일 이름
     private int fileAttached; // 파일 첨부 여부 (첨부1, 미첨부0)
 
     public BoardDTO(Long id, String boardWriter, String boardTitle, int boardHits, LocalDateTime boardCreatedTime) {
@@ -44,6 +47,19 @@ public class BoardDTO {
         boardDTO.setBoardContents(boardEntity.getBoardContents());
         boardDTO.setBoardHits(boardEntity.getBoardHits());
         boardDTO.setBoardCreatedTime(boardEntity.getCreatedTime());
+        if (boardEntity.getFileAttached() == 0) {
+            boardDTO.setFileAttached(boardEntity.getFileAttached()); // 0
+        } else {
+            List<String> originalFileNameList = new ArrayList<String>();
+            List<String> storedFilenameList = new ArrayList<String>();
+            boardDTO.setFileAttached(boardEntity.getFileAttached());
+            for(BoardFileEntity boardFileEntity: boardEntity.getBoardFileEntityList()) {
+                originalFileNameList.add(boardFileEntity.getOriginalFilename());
+                storedFilenameList.add(boardFileEntity.getStoredFilename());
+            }
+            boardDTO.setOriginalFileName(originalFileNameList);
+            boardDTO.setStoredFileName(storedFilenameList);
+        }
         return boardDTO;
     }
 
